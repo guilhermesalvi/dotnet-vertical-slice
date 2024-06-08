@@ -1,0 +1,28 @@
+{
+    "author": "Guilherme Salvi",
+    "classifications": [
+      "API",
+      "Microservice",
+      "Web"
+    ],
+    "identity": "VerticalSlice",
+    "name": "Vertical Slice",
+    "shortName": "vertical-slice",
+    "tags": {
+      "language": "C#",
+      "type": "project"
+    },
+    "sourceName": "VerticalSlice",
+    "preferNameDirectory": true,
+    "sources": [
+      {
+        "modifiers": [
+          {
+            "exclude": [
+              ".template_config/**"
+            ]
+          }
+        ]
+      }
+    ]
+  }
