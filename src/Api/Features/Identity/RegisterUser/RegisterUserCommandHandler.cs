@@ -14,9 +14,9 @@ public class RegisterUserCommandHandler(
         var user = request.ToUser();
 
         context.Users.Add(user);
-        context.Memberships.Add(new Membership(user.Id, Guid.Empty, request.OrganizationId));
+        context.Memberships.Add(new Membership(user.Id, request.RoleId, request.OrganizationId));
         await context.SaveChangesAsync(cancellationToken);
 
-        return RegisterUserOutput.FromUser(user, request.OrganizationId);
+        return RegisterUserOutput.FromUser(user, request.RoleId, request.OrganizationId);
     }
 }
