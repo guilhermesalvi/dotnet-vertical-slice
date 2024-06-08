@@ -21,4 +21,34 @@
     <data name="DefaultApiError" xml:space="preserve">
         <value>Tivemos um problema ao processar a sua solicitação</value>
     </data>
+    <data name="UserOrganizationIdEmpty" xml:space="preserve">
+        <value>O id da organização deve ser informado</value>
+    </data>
+    <data name="UserOrganizationNotFound" xml:space="preserve">
+        <value>A organização não foi encontrada</value>
+    </data>
+    <data name="UserDisplayNameEmpty" xml:space="preserve">
+        <value>O nome do usuário deve ser informado</value>
+    </data>
+    <data name="UserDisplayNameInvalidLength" xml:space="preserve">
+        <value>O nome do usuário deve ter entre 3 em 50 caracteres</value>
+    </data>
+    <data name="UserEmailEmpty" xml:space="preserve">
+        <value>O e-mail do usuário deve ser informado</value>
+    </data>
+    <data name="UserEmailInvalidLength" xml:space="preserve">
+        <value>O e-mail do usuário deve ter entre 3 e 50 caracteres</value>
+    </data>
+    <data name="UserEmailInvalidFormat" xml:space="preserve">
+        <value>O e-mail do usuário está em um formato inválido</value>
+    </data>
+    <data name="UserEmailAlreadyExists" xml:space="preserve">
+        <value>O e-mail do usuário já existe</value>
+    </data>
+    <data name="UserRoleIdEmpty" xml:space="preserve">
+        <value>A role do usuário deve ser informada</value>
+    </data>
+    <data name="UserRoleNotFound" xml:space="preserve">
+        <value>A role não foi encontrada</value>
+    </data>
 </root>

@@ -32,6 +32,7 @@ try
         .UseGlobalExceptionHandler()
         .UseHttpsRedirection()
         .UseRouting()
+        .UseEndpoints()
         .UseDocumentation();
 
     app.Run();
