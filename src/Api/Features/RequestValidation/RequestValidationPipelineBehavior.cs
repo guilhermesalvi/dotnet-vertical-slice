@@ -2,6 +2,8 @@
 using MediatR;
 using VerticalSlice.Api.Shared.Notifications;
 
+#pragma warning disable CS8603 // Possible null reference return.
+
 namespace VerticalSlice.Api.Features.RequestValidation;
 
 public class RequestValidationPipelineBehavior<TRequest, TResponse>(
@@ -31,6 +33,6 @@ public class RequestValidationPipelineBehavior<TRequest, TResponse>(
         }
 
         logger.LogWarning("{Request} not sent to handler because validation failed", typeof(TRequest).Name);
-        return default!;
+        return default;
     }
 }

@@ -1,17 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace VerticalSlice.Api.Features.AuditEventProcessor;
+﻿namespace VerticalSlice.Api.Features.AuditEventProcessor;
 
 public static class AuditEventProcessorExtensions
 {
     public static IServiceCollection AddAuditEventProcessor(
-        this IServiceCollection services,
-        IConfiguration configuration)
+        this IServiceCollection services)
     {
-        services
-            .AddDbContext<AuditEventDbContext>(options =>
-                options.UseInMemoryDatabase("AuditEventProcessor"));
-
-        return services;
+        return services.AddScoped<AuditEventManager>();
     }
 }

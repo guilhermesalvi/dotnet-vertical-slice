@@ -1,51 +1,24 @@
-﻿using System.Text.Json;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Extensions.Caching.Distributed;
 
 namespace VerticalSlice.Api.Features.Idempotency;
 
-public class IdempotentReceiver(IdempotencyDbContext context)
+public class IdempotentReceiver(IDistributedCache cache)
 {
-    public Task<bool> IsProcessedAsync(Guid key, CancellationToken cancellationToken)
-    {
-        return context.Records
-            .AnyAsync(m => m.Key == key, cancellationToken);
-    }
+    private readonly DistributedCacheEntryOptions _options = new()
+        { AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(3) };
 
-    public async Task<T?> GetDataAsync<T>(Guid key, CancellationToken cancellationToken)
-    {
-        var serialized = await context.Records
-            .Where(m => m.Key == key)
-            .Select(m => m.SerializedData)
-            .FirstOrDefaultAsync(cancellationToken);
+    public async Task<bool> IsProcessedAsync(Guid key, CancellationToken cancellationToken) =>
+        await cache.GetStringAsync(key.ToString(), cancellationToken) is not null;
 
-        return serialized is not null
-            ? JsonSerializer.Deserialize<T>(serialized)
-            : default;
-    }
+    public Task SetProcessedAsync(Guid key, CancellationToken cancellationToken) =>
+        cache.SetStringAsync(key.ToString(), string.Empty, _options, cancellationToken);
 
-    public Task SetProcessedAsync(Guid key, CancellationToken cancellationToken)
-    {
-        context.Records.Add(new IdempotencyRecord(key, null));
-        return context.SaveChangesAsync(cancellationToken);
-    }
+    public Task UpdateResourceAsync(Guid key, string resource, CancellationToken cancellationToken) =>
+        cache.SetStringAsync(key.ToString(), resource, _options, cancellationToken);
 
-    public Task UpdateRecordAsync<T>(Guid key, T? data, CancellationToken cancellationToken)
-    {
-        var serialized = data is not null ? JsonSerializer.Serialize(data) : null;
-        context.Records.Update(new IdempotencyRecord(key, serialized));
-        return context.SaveChangesAsync(cancellationToken);
-    }
+    public Task<string?> GetResourceAsync(Guid key, CancellationToken cancellationToken) =>
+        cache.GetStringAsync(key.ToString(), cancellationToken);
 
-    public async Task SetUnprocessedAsync(Guid key, CancellationToken cancellationToken)
-    {
-        var record = await context.Records
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Key == key, cancellationToken);
-
-        if (record is not null)
-        {
-            context.Records.Remove(record);
-            await context.SaveChangesAsync(cancellationToken);
-        }
-    }
+    public Task SetUnprocessedAsync(Guid key, CancellationToken cancellationToken) =>
+        cache.RemoveAsync(key.ToString(), cancellationToken);
 }

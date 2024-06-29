@@ -1,19 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace VerticalSlice.Api.Features.Idempotency;
+﻿namespace VerticalSlice.Api.Features.Idempotency;
 
 public static class IdempotencyExtensions
 {
     public static IServiceCollection AddIdempotency(
-        this IServiceCollection services,
-        IConfiguration configuration)
+        this IServiceCollection services)
     {
-        services
-            .AddDbContext<IdempotencyDbContext>(options =>
-                options.UseInMemoryDatabase("Idempotency"))
+        return services
             .AddScoped(typeof(IdempotencyPipelineBehavior<,>))
             .AddScoped<IdempotentReceiver>();
-
-        return services;
     }
 }

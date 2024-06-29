@@ -1,7 +1,9 @@
-﻿using MediatR;
+﻿using System.Text.Json;
+using MediatR;
 using Serilog.Context;
 using VerticalSlice.Api.Shared.SeedWork.Logging;
-using VerticalSlice.Api.Shared.SeedWork.Models;
+
+#pragma warning disable CS8603 // Possible null reference return.
 
 namespace VerticalSlice.Api.Features.Idempotency;
 
@@ -17,26 +19,25 @@ public class IdempotencyPipelineBehavior<TRequest, TResponse>(
     {
         using (LogContext.Push(new LogEnricherBuilder()
                    .WithProperty(nameof(request.IdempotencyKey), request.IdempotencyKey.ToString())
-                   .WithProperty(nameof(request.IgnoreIdempotency), request.IgnoreIdempotency.ToString())))
+                   .WithProperty(nameof(request.BypassIdempotency), request.BypassIdempotency.ToString())))
         {
             try
             {
-                switch (request.IgnoreIdempotency)
+                if (!request.BypassIdempotency &&
+                    await idempotentReceiver.IsProcessedAsync(request.IdempotencyKey, cancellationToken))
                 {
-                    case false
-                        when await idempotentReceiver.IsProcessedAsync(request.IdempotencyKey, cancellationToken):
-                        var data = await idempotentReceiver.GetDataAsync<TResponse>(request.IdempotencyKey,
-                            cancellationToken);
-                        return data is not null ? data : default!;
-                    case false:
-                        await idempotentReceiver.SetProcessedAsync(request.IdempotencyKey, cancellationToken);
-                        break;
+                    var data = await idempotentReceiver.GetResourceAsync(request.IdempotencyKey, cancellationToken);
+                    return data is not null ? JsonSerializer.Deserialize<TResponse>(data) : default;
                 }
+
+                await idempotentReceiver.SetProcessedAsync(request.IdempotencyKey, cancellationToken);
 
                 var response = await next();
 
-                if (!request.IgnoreIdempotency)
-                    await idempotentReceiver.UpdateRecordAsync(request.IdempotencyKey, response, cancellationToken);
+                await idempotentReceiver.UpdateResourceAsync(
+                    request.IdempotencyKey,
+                    JsonSerializer.Serialize(response),
+                    cancellationToken);
 
                 return response;
             }

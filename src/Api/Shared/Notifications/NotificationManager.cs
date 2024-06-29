@@ -12,8 +12,10 @@ public sealed class NotificationManager
     public NotificationManager(IStringLocalizerFactory factory)
     {
         var type = typeof(SharedResource);
-        var assemblyName = new AssemblyName(type.Assembly.FullName!);
-        _localizer = factory.Create(type.Name, assemblyName.Name!);
+        var assemblyName = new AssemblyName(type.Assembly.FullName
+                                            ?? throw new InvalidOperationException("Assembly full name is null"));
+        _localizer = factory.Create(type.Name, assemblyName.Name
+                                               ?? throw new InvalidOperationException("Assembly name is null"));
     }
 
     private readonly HashSet<Notification> _notifications = [];

@@ -38,11 +38,13 @@ public static class GlobalExceptionHandlerExtensions
             using var scope = factory.CreateScope();
             var manager = scope.ServiceProvider.GetRequiredService<NotificationManager>();
             manager.AddNotification(DefaultApiError);
-            var errors = manager.Notifications.Select(x => x.Value);
 
-            var problemDetails = new ValidationProblemResult(errors)
+            var problemDetails = new ValidationProblemResult(manager.Notifications)
             {
-                Status = StatusCodes.Status500InternalServerError
+                Status = StatusCodes.Status500InternalServerError,
+                Title = "Server error",
+                Detail = "An error occurred while processing your request",
+                Instance = httpContext.Request.Path
             };
 
             httpContext.Response.StatusCode = problemDetails.Status.Value;

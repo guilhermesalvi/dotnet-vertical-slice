@@ -1,4 +1,5 @@
 using Serilog;
+using VerticalSlice.Api.Data.Extensions;
 using VerticalSlice.Api.Extensions;
 
 Log.Logger = new LoggerConfiguration()
@@ -22,7 +23,8 @@ try
         .AddEndpointsApiExplorer()
         .AddDocumentation()
         .AddGlobalExceptionHandler()
-        .AddFeatures(builder.Configuration);
+        .AddData(builder.Configuration)
+        .AddFeatures();
 
     var app = builder.Build();
 
